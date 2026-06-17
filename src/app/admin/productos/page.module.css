@@ -1,0 +1,35 @@
+.tableHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.25rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.tableTitle {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-primary-dark, #0f1c2e);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  color: var(--color-primary-light, #2d4a6f);
+  background: transparent;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+}
+
+.actionBtn:hover {
+  background: var(--color-bg-secondary, #f5f2ed);
+  color: var(--color-accent-dark, #a8864a);
+  transform: scale(1.1);
+}

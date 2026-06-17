@@ -1,0 +1,26 @@
+.title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--color-primary-dark, #0f1c2e);
+  margin-bottom: 2rem;
+  letter-spacing: -0.01em;
+}
+
+.section {
+  background: var(--color-bg, #fdfcfa);
+  border: 1px solid var(--color-border, #e8e4de);
+  border-radius: var(--radius-lg, 0.875rem);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(26, 47, 74, 0.06));
+}
+
+.subtitle {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-primary-dark, #0f1c2e);
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-border-light, #f0ece6);
+}

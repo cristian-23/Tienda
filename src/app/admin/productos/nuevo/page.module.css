@@ -1,0 +1,7 @@
+.title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--color-primary-dark, #0f1c2e);
+  margin-bottom: 2rem;
+  letter-spacing: -0.01em;
+}

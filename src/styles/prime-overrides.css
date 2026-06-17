@@ -1,0 +1,279 @@
+:root {
+  --primary-color: #1a2f4a;
+  --primary-color-text: #ffffff;
+  --primary-50: #f4f6f9;
+  --primary-100: #e2e7f0;
+  --primary-200: #cbd5e1;
+  --primary-300: #94a3b8;
+  --primary-400: #64748b;
+  --primary-500: #1a2f4a;
+  --primary-600: #2d4a6f;
+  --primary-700: #0f1c2e;
+  --primary-800: #0a1320;
+  --primary-900: #050a10;
+}
+
+/* Sobrescribir DataTable para que sea ultra-premium */
+.p-datatable.p-datatable-striped .p-datatable-tbody > tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.02) !important;
+}
+
+.p-datatable .p-datatable-thead > tr > th {
+  background: var(--color-bg-secondary) !important;
+  color: var(--color-text-secondary) !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  border-width: 0 0 1px 0 !important;
+  border-color: var(--color-border) !important;
+  padding: 1rem 1.25rem !important;
+  font-size: 0.75rem !important;
+  transition: background-color 0.2s !important;
+}
+
+.p-datatable .p-datatable-tbody > tr {
+  background: var(--color-bg) !important;
+  color: var(--color-text) !important;
+  transition: all 0.2s ease !important;
+}
+
+.p-datatable .p-datatable-tbody > tr > td {
+  border-width: 0 0 1px 0 !important;
+  border-color: var(--color-border) !important;
+  padding: 1rem 1.25rem !important;
+  font-size: 0.875rem !important;
+}
+
+.p-datatable .p-datatable-tbody > tr:hover {
+  background: var(--color-bg-tertiary) !important;
+}
+
+.p-datatable .p-datatable-header {
+  background: transparent !important;
+  border: none !important;
+  padding: 1rem 1.25rem 1rem 1.25rem !important;
+}
+
+/* Card container styling */
+.card {
+  background: var(--color-bg) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: 1.5rem 2rem !important;
+  box-shadow: var(--shadow-md) !important;
+  margin-bottom: 2rem !important;
+}
+
+/* Redondear contenedor de la tabla */
+.card .p-datatable {
+  border: none !important;
+  border-radius: 0 !important;
+  overflow: hidden !important;
+  box-shadow: none !important;
+}
+
+.card .p-datatable .p-datatable-header {
+  padding: 0.25rem 0 1rem 0 !important;
+}
+
+/* Paginador moderno */
+.p-paginator {
+  background: var(--color-bg) !important;
+  border-color: var(--color-border) !important;
+  border-width: 1px 0 0 0 !important;
+  padding: 0.75rem 1rem !important;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg) !important;
+}
+
+.card .p-paginator {
+  border-width: 1px 0 0 0 !important;
+  padding: 1rem 0 0.25rem 0 !important;
+  border-radius: 0 !important;
+}
+
+.p-paginator .p-paginator-pages .p-paginator-page {
+  border-radius: var(--radius-md, 0.625rem) !important;
+  min-width: 2.25rem !important;
+  height: 2.25rem !important;
+  margin: 0 0.125rem !important;
+  transition: all 0.2s !important;
+}
+
+.p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
+  background: var(--color-primary, #1a2f4a) !important;
+  color: #fff !important;
+}
+
+/* Inputs de texto y dropdowns */
+.p-inputtext, .p-dropdown {
+  border-radius: var(--radius-md) !important;
+  border: 1px solid var(--color-border-light) !important;
+  background: var(--color-bg) !important;
+  color: var(--color-text) !important;
+  padding: 0.625rem 0.875rem !important;
+  font-family: var(--font-sans) !important;
+  font-size: 0.875rem !important;
+  transition: all var(--transition-fast) !important;
+  box-shadow: none !important;
+}
+
+.p-dropdown .p-inputtext {
+  border: none !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+.p-dropdown .p-dropdown-trigger {
+  color: var(--color-text-secondary) !important;
+}
+
+.p-inputtext:enabled:hover, .p-dropdown:not(.p-disabled):hover {
+  border-color: var(--color-text-secondary) !important;
+}
+
+.p-inputtext:enabled:focus, .p-dropdown:not(.p-disabled).p-focus {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 1px var(--color-primary) !important;
+  outline: none !important;
+}
+
+/* Dropdown Panel (Lista desplegable) */
+.p-dropdown-panel {
+  background: var(--color-bg-secondary) !important;
+  border: 1px solid var(--color-border-light) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item {
+  color: var(--color-text) !important;
+  font-family: var(--font-sans) !important;
+  font-size: 0.875rem !important;
+  padding: 0.625rem 1rem !important;
+  transition: background 0.2s !important;
+}
+
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item:hover,
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight {
+  background: var(--color-bg-tertiary) !important;
+  color: var(--color-text) !important;
+}
+
+/* InputSwitch (Toggle) */
+.p-inputswitch {
+  width: 2.75rem !important;
+  height: 1.5rem !important;
+}
+
+.p-inputswitch .p-inputswitch-slider {
+  border-radius: var(--radius-full) !important;
+  background: var(--color-border) !important;
+  transition: background-color 0.2s, box-shadow 0.2s !important;
+}
+
+.p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
+  background: var(--color-primary) !important;
+}
+
+.p-inputswitch.p-focus .p-inputswitch-slider {
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.15) !important;
+}
+
+.p-inputswitch .p-inputswitch-slider:before {
+  width: 1.125rem !important;
+  height: 1.125rem !important;
+  left: 0.1875rem !important;
+  margin-top: -0.5625rem !important;
+  border-radius: 50% !important;
+  background: #ffffff !important;
+  transition: transform 0.2s !important;
+}
+
+.p-inputswitch.p-inputswitch-checked .p-inputswitch-slider:before {
+  transform: translateX(1.25rem) !important;
+}
+
+/* FileUpload styling */
+.p-fileupload .p-fileupload-choose {
+  background: var(--color-primary) !important;
+  color: var(--color-text-inverse) !important;
+  border-color: var(--color-primary) !important;
+  border-radius: var(--radius-md) !important;
+  font-family: var(--font-sans) !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  padding: 0.5rem 1rem !important;
+  transition: all 0.2s !important;
+}
+
+.p-fileupload .p-fileupload-choose:hover {
+  background: var(--color-primary-dark) !important;
+  border-color: var(--color-primary-dark) !important;
+  color: var(--color-text-inverse) !important;
+}
+
+/* Toast Ultra Moderno */
+.p-toast {
+  font-family: var(--font-sans) !important;
+  font-size: 0.875rem !important;
+  opacity: 0.95;
+}
+
+.p-toast .p-toast-message {
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-xl) !important;
+  background: var(--color-bg-secondary) !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text) !important;
+  backdrop-filter: blur(8px);
+}
+
+.p-toast .p-toast-message .p-toast-message-content {
+  padding: 1rem 1.25rem !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+}
+
+.p-toast .p-toast-message.p-toast-message-success .p-toast-icon {
+  color: var(--color-success) !important;
+}
+
+.p-toast .p-toast-message.p-toast-message-error .p-toast-icon {
+  color: var(--color-error) !important;
+}
+
+.p-toast .p-toast-message .p-toast-detail {
+  color: var(--color-text-secondary) !important;
+  margin: 0 !important;
+}
+
+.p-toast .p-toast-message .p-toast-summary {
+  font-weight: 600 !important;
+  color: var(--color-text) !important;
+}
+
+/* Tags de PrimeReact */
+.p-tag {
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: var(--radius-sm, 0.375rem) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.p-tag-success {
+  background-color: var(--color-success-bg) !important;
+  color: var(--color-success-text) !important;
+  border: 1px solid var(--color-success-border) !important;
+}
+.p-tag-danger {
+  background-color: var(--color-error-bg) !important;
+  color: var(--color-error-text) !important;
+  border: 1px solid var(--color-error-border) !important;
+}
+.p-tag-info {
+  background-color: var(--color-bg-secondary) !important;
+  color: var(--color-text-secondary) !important;
+  border: 1px solid var(--color-border) !important;
+}

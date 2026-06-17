@@ -1,0 +1,81 @@
+.filters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.title {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-sm);
+  font-family: inherit;
+  color: var(--color-text-secondary);
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: left;
+}
+
+.link:hover {
+  color: var(--color-primary);
+  background: var(--color-bg-secondary);
+}
+
+.active {
+  color: var(--color-primary);
+  font-weight: 600;
+  background: var(--color-bg-secondary);
+}
+
+.count {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+.sortSelect {
+  width: 100%;
+}
+
+.select {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(196, 162, 101, 0.15);
+}

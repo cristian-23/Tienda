@@ -1,0 +1,20 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.input {
+  width: 100%;
+}
+
+.error {
+  color: var(--color-error);
+  font-size: 0.75rem;
+}

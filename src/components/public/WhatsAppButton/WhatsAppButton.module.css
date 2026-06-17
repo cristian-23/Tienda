@@ -1,0 +1,18 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-3) var(--space-6);
+  /* background: var(--color-whatsapp); */
+  color: white;
+  font-size: var(--text-base);
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  transition: background var(--transition-fast);
+}
+
+.button:hover {
+  background: var(--color-whatsapp-dark);
+}
