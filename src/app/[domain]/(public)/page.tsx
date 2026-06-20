@@ -21,6 +21,7 @@ export default async function HomePage({ params }: { params: Promise<{ domain: s
       <HeroBanner
         title={settings?.heroTitle || settings?.businessName || "Bienvenido"}
         subtitle={settings?.heroSubtitle || "Los mejores productos para tu hogar."}
+        bgUrl={settings?.heroBgUrl}
       />
 
       {settings?.aboutText && (

@@ -105,6 +105,7 @@ model StoreSettings {
   heroTitle      String?  @map("hero_title")
   heroSubtitle   String?  @map("hero_subtitle")
   aboutText      String?  @map("about_text")
+  heroBgUrl      String?  @map("hero_bg_url")
   updatedAt      DateTime @updatedAt @map("updated_at")
   tenantId       String   @unique @map("tenant_id")
   tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)

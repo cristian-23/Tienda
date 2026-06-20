@@ -14,4 +14,5 @@ export type StoreSettingsDTO = {
   heroTitle: string | null
   heroSubtitle: string | null
   aboutText: string | null
+  heroBgUrl: string | null
 }

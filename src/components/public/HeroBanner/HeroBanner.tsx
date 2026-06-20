@@ -4,11 +4,20 @@ import styles from './HeroBanner.module.css'
 type HeroBannerProps = {
   title: string
   subtitle?: string
+  bgUrl?: string | null
 }
 
-export function HeroBanner({ title, subtitle }: HeroBannerProps) {
+export function HeroBanner({ title, subtitle, bgUrl }: HeroBannerProps) {
+  const style = bgUrl
+    ? {
+        backgroundImage: `linear-gradient(rgba(9, 9, 11, 0.75), rgba(9, 9, 11, 0.85)), url(${bgUrl})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }
+    : {}
+
   return (
-    <section className={styles.hero}>
+    <section className={styles.hero} style={style}>
       <div className={styles.bgPattern} aria-hidden="true" />
       <div className={styles.content}>
         <span className={styles.eyebrow}>Tu descanso, nuestra prioridad</span>

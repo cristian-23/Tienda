@@ -61,8 +61,26 @@
 }
 
 @media (max-width: 768px) {
+  .inner {
+    gap: var(--space-3);
+    padding: 0 var(--space-3);
+  }
+
   .nav {
     display: none;
+  }
+
+  .logoImg {
+    max-height: 28px;
+    width: auto !important;
+  }
+
+  .logoText {
+    font-size: var(--text-sm);
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .search {

@@ -55,6 +55,7 @@ export async function getSettings(): Promise<ActionResponse<StoreSettingsDTO>> {
           heroTitle: null,
           heroSubtitle: null,
           aboutText: null,
+          heroBgUrl: null,
         },
       }
     }

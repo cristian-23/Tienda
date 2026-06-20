@@ -19,6 +19,7 @@ export const updateSettingsSchema = z.object({
   heroTitle: z.string().max(200, 'Máximo 200 caracteres').optional().or(z.literal('')),
   heroSubtitle: z.string().max(500, 'Máximo 500 caracteres').optional().or(z.literal('')),
   aboutText: z.string().max(2000, 'Máximo 2000 caracteres').optional().or(z.literal('')),
+  heroBgUrl: z.string().url('URL inválida').optional().or(z.literal('')),
 })
 
 export type UpdateSettingsInput = z.infer<typeof updateSettingsSchema>

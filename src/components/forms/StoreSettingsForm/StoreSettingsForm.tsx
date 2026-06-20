@@ -27,6 +27,10 @@ export function StoreSettingsForm({ defaultValues, onSubmit }: StoreSettingsForm
   const faviconInputRef = useRef<HTMLInputElement>(null)
   const [faviconPreview, setFaviconPreview] = useState<string | null>(defaultValues?.faviconUrl ?? null)
 
+  const [heroBgUploading, setHeroBgUploading] = useState(false)
+  const heroBgInputRef = useRef<HTMLInputElement>(null)
+  const [heroBgPreview, setHeroBgPreview] = useState<string | null>(defaultValues?.heroBgUrl ?? null)
+
   const { control, handleSubmit, setValue, formState: { errors } } = useForm<UpdateSettingsInput>({
     resolver: zodResolver(updateSettingsSchema),
     defaultValues: defaultValues ? {
@@ -38,6 +42,7 @@ export function StoreSettingsForm({ defaultValues, onSubmit }: StoreSettingsForm
       heroTitle: defaultValues.heroTitle ?? '',
       heroSubtitle: defaultValues.heroSubtitle ?? '',
       aboutText: defaultValues.aboutText ?? '',
+      heroBgUrl: defaultValues.heroBgUrl ?? '',
     } : {
       businessName: '',
       whatsappNumber: '',
@@ -49,6 +54,7 @@ export function StoreSettingsForm({ defaultValues, onSubmit }: StoreSettingsForm
       heroTitle: '',
       heroSubtitle: '',
       aboutText: '',
+      heroBgUrl: '',
     },
   })
 
@@ -98,6 +104,28 @@ export function StoreSettingsForm({ defaultValues, onSubmit }: StoreSettingsForm
     }
   }
 
+  async function handleHeroBgUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setHeroBgUploading(true)
+    try {
+      const body = new FormData()
+      body.set('file', file)
+      const res = await fetch('/api/upload', { method: 'POST', body })
+      if (!res.ok) throw new Error('Error al subir la imagen')
+      const data = await res.json()
+      setValue('heroBgUrl', data.url)
+      setHeroBgPreview(data.url)
+      showToast('success', 'Fondo de portada subido correctamente')
+    } catch {
+      showToast('error', 'Error', 'Error al subir el fondo de portada')
+    } finally {
+      setHeroBgUploading(false)
+      if (heroBgInputRef.current) heroBgInputRef.current.value = ''
+    }
+  }
+
   async function handleFormSubmit(data: UpdateSettingsInput) {
     startTransition(async () => {
       const formData = new FormData()
@@ -111,6 +139,7 @@ export function StoreSettingsForm({ defaultValues, onSubmit }: StoreSettingsForm
       formData.set('heroTitle', data.heroTitle ?? '')
       formData.set('heroSubtitle', data.heroSubtitle ?? '')
       formData.set('aboutText', data.aboutText ?? '')
+      formData.set('heroBgUrl', data.heroBgUrl ?? '')
       const result = await onSubmit(null, formData)
       if (result.success) {
         showToast('success', 'Configuración guardada')
@@ -196,6 +225,27 @@ export function StoreSettingsForm({ defaultValues, onSubmit }: StoreSettingsForm
             )}
           </div>
           <input type="hidden" {...{ name: 'faviconUrl' }} value={faviconPreview ?? ''} />
+        </div>
+
+        <div className={styles.logoSection}>
+          <span className={styles.logoLabel}>Fondo de Portada (Imagen o GIF)</span>
+          {heroBgPreview && (
+            <div className={styles.logoPreview} style={{ width: '100%', height: '120px', position: 'relative' }}>
+              <img src={heroBgPreview} alt="Fondo Portada" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'var(--radius-md)' }} />
+            </div>
+          )}
+          <div className={styles.logoActions}>
+            <input ref={heroBgInputRef} type="file" accept="image/*" onChange={handleHeroBgUpload} className={styles.fileInput} id="hero-bg-upload" />
+            <Button type="button" variant="secondary" isLoading={heroBgUploading} onClick={() => heroBgInputRef.current?.click()}>
+              {heroBgUploading ? 'Subiendo...' : heroBgPreview ? 'Cambiar fondo' : 'Subir fondo'}
+            </Button>
+            {heroBgPreview && (
+              <Button type="button" variant="ghost" onClick={() => { setValue('heroBgUrl', ''); setHeroBgPreview(null) }}>
+                Quitar fondo
+              </Button>
+            )}
+          </div>
+          <input type="hidden" {...{ name: 'heroBgUrl' }} value={heroBgPreview ?? ''} />
         </div>
       </div>
 

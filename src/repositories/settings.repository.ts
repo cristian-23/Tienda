@@ -13,6 +13,7 @@ function mapSettings(settings: {
   heroTitle: string | null
   heroSubtitle: string | null
   aboutText: string | null
+  heroBgUrl: string | null
 }): StoreSettingsDTO {
   const addresses = Array.isArray(settings.addresses)
     ? (settings.addresses as { label: string; address: string }[])
@@ -28,6 +29,7 @@ function mapSettings(settings: {
     heroTitle: settings.heroTitle,
     heroSubtitle: settings.heroSubtitle,
     aboutText: settings.aboutText,
+    heroBgUrl: settings.heroBgUrl,
   }
 }
 
@@ -61,6 +63,7 @@ export const settingsRepository = {
         heroTitle: data.heroTitle || null,
         heroSubtitle: data.heroSubtitle || null,
         aboutText: data.aboutText || null,
+        heroBgUrl: data.heroBgUrl || null,
       },
       create: {
         businessName: data.businessName,
@@ -73,6 +76,7 @@ export const settingsRepository = {
         heroTitle: data.heroTitle || null,
         heroSubtitle: data.heroSubtitle || null,
         aboutText: data.aboutText || null,
+        heroBgUrl: data.heroBgUrl || null,
         tenantId: tenant.id
       },
     })
