@@ -25,6 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
     } : {
       icon: '/default-favicon.ico',
     },
+    manifest: '/manifest.json',
   }
 }
 
@@ -35,7 +36,23 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="es" className={`${poppins.variable} ${poppins.className}`}>
-      <body cz-shortcut-listen="true">{children}</body>
+      <body cz-shortcut-listen="true">
+        {children}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js').then(
+                    function(reg) { console.log('SW registered:', reg.scope); },
+                    function(err) { console.log('SW registration failed:', err); }
+                  );
+                });
+              }
+            `
+          }}
+        />
+      </body>
     </html>
   )
 }

@@ -187,8 +187,14 @@
   justify-content: center;
 }
 
-.imageContainer[style*="scale(2)"] {
-  cursor: zoom-out;
+.imageContainerZoomed {
+  cursor: grab;
+}
+
+.imageContainerDragging {
+  cursor: grabbing;
+  transition: none !important;
+  user-select: none;
 }
 
 .lightboxImage {
