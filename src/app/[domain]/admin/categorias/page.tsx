@@ -5,11 +5,12 @@ import { redirect } from 'next/navigation'
 import { categoryService } from '@/services/category.service'
 import { CategoriesTable } from './CategoriesTable'
 
-export default async function AdminCategoriesPage() {
+export default async function AdminCategoriesPage({ params }: { params: Promise<{ domain: string }> }) {
   const session = await auth()
   if (!session?.user) redirect('/admin')
 
-  const categories = await categoryService.getAdminCategories()
+  const { domain } = await params
+  const categories = await categoryService.getAdminCategories(domain)
 
   return <CategoriesTable categories={categories} />
 }

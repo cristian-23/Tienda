@@ -8,6 +8,21 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+model Tenant {
+  id        String   @id @default(cuid())
+  name      String
+  subdomain String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  users         User[]
+  categories    Category[]
+  products      Product[]
+  storeSettings StoreSettings?
+
+  @@map("tenants")
+}
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
@@ -15,27 +30,34 @@ model User {
   name      String?
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  tenantId  String   @map("tenant_id")
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
+  @@index([tenantId])
   @@map("users")
 }
 
 model Category {
   id          String    @id @default(cuid())
   name        String
-  slug        String    @unique
+  slug        String
   description String?
   active      Boolean   @default(true)
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
+  tenantId    String    @map("tenant_id")
+  tenant      Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   products    Product[]
 
+  @@unique([tenantId, slug])
+  @@index([tenantId])
   @@map("categories")
 }
 
 model Product {
   id               String        @id @default(cuid())
   name             String
-  slug             String        @unique
+  slug             String
   shortDescription String?       @map("short_description")
   description      String?
   price            Decimal        @db.Decimal(10, 2)
@@ -44,13 +66,16 @@ model Product {
   active           Boolean       @default(true)
   categoryId       String        @map("category_id")
   category         Category      @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  tenantId         String        @map("tenant_id")
+  tenant           Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   images           ProductImage[]
   createdAt        DateTime      @default(now()) @map("created_at")
   updatedAt        DateTime      @updatedAt @map("updated_at")
 
+  @@unique([tenantId, slug])
+  @@index([tenantId])
   @@index([categoryId])
   @@index([active, featured])
-  @@index([slug])
   @@map("products")
 }
 
@@ -77,7 +102,12 @@ model StoreSettings {
   faviconUrl     String?  @map("favicon_url")
   primaryColor   String?  @map("primary_color")
   secondaryColor String?  @map("secondary_color")
+  heroTitle      String?  @map("hero_title")
+  heroSubtitle   String?  @map("hero_subtitle")
+  aboutText      String?  @map("about_text")
   updatedAt      DateTime @updatedAt @map("updated_at")
+  tenantId       String   @unique @map("tenant_id")
+  tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@map("store_settings")
 }

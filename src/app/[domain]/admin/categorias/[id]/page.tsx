@@ -6,17 +6,17 @@ import { EditCategoryClient } from './EditCategoryClient'
 import { categoryService } from '@/services/category.service'
 import styles from './page.module.css'
 
-type Props = { params: Promise<{ id: string }> }
+type Props = { params: Promise<{ id: string; domain: string }> }
 
 export default async function EditCategoryPage({ params }: Props) {
   const session = await auth()
   if (!session?.user) redirect('/admin')
 
-  const { id } = await params
+  const { id, domain } = await params
 
   let category
   try {
-    category = await categoryService.getById(id)
+    category = await categoryService.getById(id, domain)
   } catch {
     notFound()
   }

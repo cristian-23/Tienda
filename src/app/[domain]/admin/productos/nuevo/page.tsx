@@ -7,11 +7,14 @@ import { categoryRepository } from '@/repositories/category.repository'
 import { createProduct } from '@/actions/products.actions'
 import styles from './page.module.css'
 
-export default async function NewProductPage() {
+type Props = { params: Promise<{ domain: string }> }
+
+export default async function NewProductPage({ params }: Props) {
   const session = await auth()
   if (!session?.user) redirect('/admin')
 
-  const categories = await categoryRepository.findAllActive()
+  const { domain } = await params
+  const categories = await categoryRepository.findAllActive(domain)
 
   return (
     <div>

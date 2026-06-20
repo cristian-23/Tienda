@@ -61,6 +61,7 @@ export type ProductFormData = {
   featured: boolean
   active: boolean
   categoryId: string
+  images?: Array<{ url: string }>
 }
 
 export type ProductListAdminDTO = {

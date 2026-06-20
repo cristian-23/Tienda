@@ -3,9 +3,10 @@
 import { revalidatePath } from 'next/cache'
 import { revalidatePublicContent } from '@/lib/revalidate-public'
 import { auth } from '@/lib/auth'
-import { settingsService } from '@/services/settings.service'
+import { settingsRepository } from '@/repositories/settings.repository'
 import { updateSettingsSchema } from '@/validations/settings.schema'
 import { UnauthorizedError, AppError } from '@/lib/errors'
+import { getDomainFromHeaders } from '@/lib/server-utils'
 import type { ActionResponse, StoreSettingsDTO } from '@/types'
 
 async function checkAuth(): Promise<void> {
@@ -17,21 +18,47 @@ function handleError<T>(error: unknown): ActionResponse<T> {
   if (error instanceof AppError) {
     return {
       success: false,
-      error: { code: error.code, message: error.message, details: error.details },
+      error: {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+      },
     } as ActionResponse<T>
   }
+
   return {
     success: false,
-    error: { code: 'INTERNAL_ERROR', message: 'Ocurrió un error inesperado' },
+    error: {
+      code: 'INTERNAL_ERROR',
+      message: 'Ocurrió un error inesperado',
+    },
   } as ActionResponse<T>
 }
 
 export async function getSettings(): Promise<ActionResponse<StoreSettingsDTO>> {
   try {
-    const settings = await settingsService.get()
+    await checkAuth()
+    const domain = await getDomainFromHeaders()
+    const settings = await settingsRepository.getByDomain(domain)
+    
     if (!settings) {
-      return { success: false, error: { code: 'NOT_FOUND', message: 'Configuración no encontrada' } }
+      return {
+        success: true,
+        data: {
+          businessName: '',
+          whatsappNumber: '',
+          addresses: [],
+          facebookUrl: null,
+          instagramUrl: null,
+          logoUrl: null,
+          faviconUrl: null,
+          heroTitle: null,
+          heroSubtitle: null,
+          aboutText: null,
+        },
+      }
     }
+    
     return { success: true, data: settings }
   } catch (error) {
     return handleError(error)
@@ -44,12 +71,21 @@ export async function updateSettings(
 ): Promise<ActionResponse<StoreSettingsDTO>> {
   try {
     await checkAuth()
+    const domain = await getDomainFromHeaders()
 
-    const raw = Object.fromEntries(formData) as Record<string, string>
-    if (raw.addresses) {
-      try { raw.addresses = JSON.parse(raw.addresses) } catch { raw.addresses = '[]' }
+    const raw = Object.fromEntries(formData)
+    
+    let addresses = []
+    try {
+      addresses = JSON.parse(raw.addresses as string)
+    } catch {
+      addresses = []
     }
-    const parsed = updateSettingsSchema.safeParse(raw)
+
+    const parsed = updateSettingsSchema.safeParse({
+      ...raw,
+      addresses,
+    })
 
     if (!parsed.success) {
       return {
@@ -62,7 +98,7 @@ export async function updateSettings(
       }
     }
 
-    const settings = await settingsService.update(parsed.data)
+    const settings = await settingsRepository.upsert(parsed.data, domain)
     revalidatePath('/admin/configuracion')
     revalidatePublicContent()
     return { success: true, data: settings }

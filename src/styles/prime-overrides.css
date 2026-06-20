@@ -83,6 +83,10 @@
   border-width: 1px 0 0 0 !important;
   padding: 0.75rem 1rem !important;
   border-radius: 0 0 var(--radius-lg) var(--radius-lg) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.25rem !important;
 }
 
 .card .p-paginator {
@@ -97,11 +101,72 @@
   height: 2.25rem !important;
   margin: 0 0.125rem !important;
   transition: all 0.2s !important;
+  color: var(--color-text-secondary) !important;
+}
+
+.p-paginator .p-paginator-pages .p-paginator-page:not(.p-highlight):hover {
+  background: var(--color-bg-tertiary) !important;
+  color: var(--color-text) !important;
 }
 
 .p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
-  background: var(--color-primary, #1a2f4a) !important;
-  color: #fff !important;
+  background: var(--color-primary, #f4f4f5) !important;
+  color: var(--color-bg, #09090b) !important;
+  font-weight: 700 !important;
+}
+
+/* Botones de navegación */
+.p-paginator .p-paginator-first,
+.p-paginator .p-paginator-prev,
+.p-paginator .p-paginator-next,
+.p-paginator .p-paginator-last {
+  color: var(--color-text-secondary) !important;
+  border-radius: var(--radius-md) !important;
+  min-width: 2.25rem !important;
+  height: 2.25rem !important;
+  transition: all 0.2s !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.p-paginator .p-paginator-first:not(.p-disabled):hover,
+.p-paginator .p-paginator-prev:not(.p-disabled):hover,
+.p-paginator .p-paginator-next:not(.p-disabled):hover,
+.p-paginator .p-paginator-last:not(.p-disabled):hover {
+  background: var(--color-bg-tertiary) !important;
+  color: var(--color-text) !important;
+}
+
+.p-paginator .p-disabled {
+  opacity: 0.35 !important;
+}
+
+/* Compactar dropdown del paginador */
+.p-paginator .p-dropdown {
+  height: 2.25rem !important;
+  padding: 0 0.5rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  border: 1px solid var(--color-border-light) !important;
+}
+
+/* Reglas Responsive para DataTable */
+@media (max-width: 768px) {
+  /* Ocultar paginador nativo de PrimeReact en móviles */
+  .p-paginator {
+    display: none !important;
+  }
+  
+  /* Ocultar tabla nativa */
+  .p-datatable-wrapper {
+    display: none !important;
+  }
+  
+  /* Quitar cabecera de la tabla nativa */
+  .p-datatable .p-datatable-thead {
+    display: none !important;
+  }
 }
 
 /* Inputs de texto y dropdowns */

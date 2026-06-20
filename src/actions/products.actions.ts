@@ -6,6 +6,7 @@ import { auth } from '@/lib/auth'
 import { productService } from '@/services/product.service'
 import { createProductSchema, updateProductSchema } from '@/validations/product.schema'
 import { UnauthorizedError, AppError } from '@/lib/errors'
+import { getDomainFromHeaders } from '@/lib/server-utils'
 import type { ActionResponse, ProductAdminDTO, ProductListAdminDTO } from '@/types'
 
 async function checkAuth(): Promise<void> {
@@ -34,17 +35,18 @@ function handleError<T>(error: unknown): ActionResponse<T> {
   } as ActionResponse<T>
 }
 
-export async function getProductsAction(
-  page = 1
-): Promise<ActionResponse<{ products: ProductListAdminDTO[]; total: number; totalPages: number }>> {
+export async function getProducts(
+  page = 1,
+  pageSize = 10
+): Promise<ActionResponse<{ products: ProductListAdminDTO[]; totalPages: number }>> {
   try {
     await checkAuth()
-    const result = await productService.getAdminList({ page, pageSize: 20 })
+    const domain = await getDomainFromHeaders()
+    const result = await productService.getAdminList({ page, pageSize }, domain)
     return {
       success: true,
       data: {
-        products: result.products as ProductListAdminDTO[],
-        total: result.pagination.total,
+        products: result.products,
         totalPages: result.pagination.totalPages,
       },
     }
@@ -53,33 +55,41 @@ export async function getProductsAction(
   }
 }
 
-export async function getProductAction(id: string): Promise<ActionResponse<ProductAdminDTO>> {
+export async function getProduct(id: string): Promise<ActionResponse<ProductAdminDTO>> {
   try {
     await checkAuth()
-    const product = await productService.getById(id)
-    if (!product) {
-      return { success: false, error: { code: 'NOT_FOUND', message: 'Producto no encontrado' } }
-    }
-    return { success: true, data: product }
+    const domain = await getDomainFromHeaders()
+    const product = await productService.getById(id, domain)
+    return { success: true, data: product as ProductAdminDTO }
   } catch (error) {
     return handleError(error)
   }
 }
 
 export async function createProduct(
-  prevState: ActionResponse | null,
+  prevState: ActionResponse<ProductAdminDTO> | null,
   formData: FormData
-): Promise<ActionResponse> {
+): Promise<ActionResponse<ProductAdminDTO>> {
   try {
     await checkAuth()
+    const domain = await getDomainFromHeaders()
 
     const raw = Object.fromEntries(formData)
+    
+    let images = []
+    try {
+      images = JSON.parse(raw.images as string)
+    } catch {
+      images = []
+    }
+
     const parsed = createProductSchema.safeParse({
       ...raw,
-      price: raw.price,
-      stock: raw.stock === '' || raw.stock === 'null' ? null : raw.stock,
+      price: Number(raw.price),
+      stock: raw.stock ? Number(raw.stock) : undefined,
       featured: raw.featured === 'true',
       active: raw.active === 'true',
+      images,
     })
 
     if (!parsed.success) {
@@ -93,10 +103,10 @@ export async function createProduct(
       }
     }
 
-    await productService.create(parsed.data)
+    const product = await productService.create(parsed.data, domain)
     revalidatePath('/admin/productos')
     revalidatePublicContent()
-    return { success: true }
+    return { success: true, data: product as unknown as ProductAdminDTO }
   } catch (error) {
     return handleError(error)
   }
@@ -104,19 +114,31 @@ export async function createProduct(
 
 export async function updateProduct(
   id: string,
-  prevState: ActionResponse | null,
+  prevState: ActionResponse<ProductAdminDTO> | null,
   formData: FormData
-): Promise<ActionResponse> {
+): Promise<ActionResponse<ProductAdminDTO>> {
   try {
     await checkAuth()
+    const domain = await getDomainFromHeaders()
 
     const raw = Object.fromEntries(formData)
+    
+    let images = []
+    try {
+      if (raw.images) {
+        images = JSON.parse(raw.images as string)
+      }
+    } catch {
+      images = []
+    }
+
     const parsed = updateProductSchema.safeParse({
       ...raw,
-      price: raw.price || undefined,
-      stock: raw.stock === '' || raw.stock === 'null' ? null : raw.stock || undefined,
-      featured: raw.featured === 'true' ? true : raw.featured === 'false' ? false : undefined,
-      active: raw.active === 'true' ? true : raw.active === 'false' ? false : undefined,
+      ...(raw.price ? { price: Number(raw.price) } : {}),
+      ...(raw.stock ? { stock: Number(raw.stock) } : {}),
+      ...(raw.featured ? { featured: raw.featured === 'true' } : {}),
+      ...(raw.active ? { active: raw.active === 'true' } : {}),
+      ...(raw.images ? { images } : {}),
     })
 
     if (!parsed.success) {
@@ -130,10 +152,11 @@ export async function updateProduct(
       }
     }
 
-    await productService.update(id, parsed.data)
+    const product = await productService.update(id, parsed.data as any, domain)
     revalidatePath('/admin/productos')
+    revalidatePath(`/admin/productos/${id}`)
     revalidatePublicContent()
-    return { success: true }
+    return { success: true, data: product as unknown as ProductAdminDTO }
   } catch (error) {
     return handleError(error)
   }
@@ -142,7 +165,8 @@ export async function updateProduct(
 export async function deleteProduct(id: string): Promise<ActionResponse> {
   try {
     await checkAuth()
-    await productService.delete(id)
+    const domain = await getDomainFromHeaders()
+    await productService.delete(id, domain)
     revalidatePath('/admin/productos')
     revalidatePublicContent()
     return { success: true }

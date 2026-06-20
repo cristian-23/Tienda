@@ -7,11 +7,12 @@ import { settingsService } from '@/services/settings.service'
 import { updateSettings } from '@/actions/settings.actions'
 import styles from './page.module.css'
 
-export default async function SettingsPage() {
+export default async function SettingsPage({ params }: { params: Promise<{ domain: string }> }) {
   const session = await auth()
   if (!session?.user) redirect('/admin')
 
-  const settings = await settingsService.get()
+  const { domain } = await params
+  const settings = await settingsService.get(domain)
 
   return (
     <div>

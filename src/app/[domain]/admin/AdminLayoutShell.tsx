@@ -7,7 +7,12 @@ import { Sidebar } from '@/components/layout/Sidebar/Sidebar'
 import { setToastRef } from '@/lib/toast'
 import styles from './layout.module.css'
 
-export function AdminLayoutShell({ children }: { children: React.ReactNode }) {
+type AdminLayoutShellProps = {
+  children: React.ReactNode
+  businessName: string
+}
+
+export function AdminLayoutShell({ children, businessName }: AdminLayoutShellProps) {
   const ref = useRef<Toast>(null)
   const pathname = usePathname()
   const isLogin = pathname === '/admin'
@@ -28,7 +33,7 @@ export function AdminLayoutShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className={styles.layout}>
-      <Sidebar />
+      <Sidebar businessName={businessName} />
       <main className={styles.main}>
         <Toast ref={ref} position="top-right" />
         {children}

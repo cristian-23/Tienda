@@ -11,7 +11,7 @@ import { Select } from '@/components/ui/Select/Select'
 import { Toggle } from '@/components/ui/Toggle/Toggle'
 import { showToast } from '@/lib/toast'
 import { createProductSchema, type CreateProductInput } from '@/validations/product.schema'
-import type { ActionResponse } from '@/types'
+import type { ActionResponse, ProductAdminDTO } from '@/types'
 import styles from './ProductForm.module.css'
 
 type CategoryOption = { id: string; name: string }
@@ -19,7 +19,7 @@ type CategoryOption = { id: string; name: string }
 type ProductFormProps = {
   categories: CategoryOption[]
   defaultValues?: Partial<CreateProductInput>
-  onSubmit: (prev: ActionResponse | null, formData: FormData) => Promise<ActionResponse>
+  onSubmit: (prev: ActionResponse<ProductAdminDTO> | null, formData: FormData) => Promise<ActionResponse<ProductAdminDTO>>
 }
 
 export function ProductForm({ categories, defaultValues, onSubmit }: ProductFormProps) {
@@ -57,9 +57,7 @@ export function ProductForm({ categories, defaultValues, onSubmit }: ProductForm
       const result = await onSubmit(null, formData)
       if (result.success) {
         showToast('success', defaultValues ? 'Producto actualizado' : 'Producto creado')
-        if (!defaultValues) {
-          setTimeout(() => router.push('/admin/productos'), 1000)
-        }
+        router.push('/admin/productos')
       } else {
         showToast('error', 'Error', result.error?.message ?? 'Error al guardar el producto')
       }

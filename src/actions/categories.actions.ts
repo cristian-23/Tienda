@@ -6,6 +6,7 @@ import { auth } from '@/lib/auth'
 import { categoryService } from '@/services/category.service'
 import { createCategorySchema, updateCategorySchema } from '@/validations/category.schema'
 import { UnauthorizedError, AppError } from '@/lib/errors'
+import { getDomainFromHeaders } from '@/lib/server-utils'
 import type { ActionResponse, CategoryAdminDTO } from '@/types'
 
 async function checkAuth(): Promise<void> {
@@ -37,7 +38,8 @@ function handleError<T>(error: unknown): ActionResponse<T> {
 export async function getCategories(): Promise<ActionResponse<CategoryAdminDTO[]>> {
   try {
     await checkAuth()
-    const categories = await categoryService.getAdminCategories()
+    const domain = await getDomainFromHeaders()
+    const categories = await categoryService.getAdminCategories(domain)
     return { success: true, data: categories }
   } catch (error) {
     return handleError(error)
@@ -47,7 +49,8 @@ export async function getCategories(): Promise<ActionResponse<CategoryAdminDTO[]
 export async function getCategory(id: string): Promise<ActionResponse<CategoryAdminDTO>> {
   try {
     await checkAuth()
-    const category = await categoryService.getById(id)
+    const domain = await getDomainFromHeaders()
+    const category = await categoryService.getById(id, domain)
     return { success: true, data: category }
   } catch (error) {
     return handleError(error)
@@ -60,6 +63,7 @@ export async function createCategory(
 ): Promise<ActionResponse<CategoryAdminDTO>> {
   try {
     await checkAuth()
+    const domain = await getDomainFromHeaders()
 
     const raw = Object.fromEntries(formData)
     const parsed = createCategorySchema.safeParse({
@@ -78,7 +82,7 @@ export async function createCategory(
       }
     }
 
-    const category = await categoryService.create(parsed.data)
+    const category = await categoryService.create(parsed.data, domain)
     revalidatePath('/admin/categorias')
     revalidatePublicContent()
     return { success: true, data: category as unknown as CategoryAdminDTO }
@@ -94,6 +98,7 @@ export async function updateCategory(
 ): Promise<ActionResponse<CategoryAdminDTO>> {
   try {
     await checkAuth()
+    const domain = await getDomainFromHeaders()
 
     const raw = Object.fromEntries(formData)
     const parsed = updateCategorySchema.safeParse({
@@ -112,7 +117,7 @@ export async function updateCategory(
       }
     }
 
-    const category = await categoryService.update(id, parsed.data)
+    const category = await categoryService.update(id, parsed.data, domain)
     revalidatePath('/admin/categorias')
     revalidatePublicContent()
     return { success: true, data: category as unknown as CategoryAdminDTO }
@@ -124,7 +129,8 @@ export async function updateCategory(
 export async function deleteCategory(id: string): Promise<ActionResponse> {
   try {
     await checkAuth()
-    await categoryService.delete(id)
+    const domain = await getDomainFromHeaders()
+    await categoryService.delete(id, domain)
     revalidatePath('/admin/categorias')
     revalidatePublicContent()
     return { success: true }

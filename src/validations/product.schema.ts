@@ -14,6 +14,7 @@ export const createProductSchema = z.object({
   featured: z.boolean(),
   active: z.boolean(),
   categoryId: z.string().min(1, 'La categoría es requerida'),
+  images: z.array(z.object({ url: z.string() })).optional(),
 })
 
 export const updateProductSchema = z.object({
@@ -31,6 +32,7 @@ export const updateProductSchema = z.object({
   featured: z.boolean().optional(),
   active: z.boolean().optional(),
   categoryId: z.string().min(1, 'La categoría es requerida').optional(),
+  images: z.array(z.object({ url: z.string() })).optional(),
 })
 
 export type CreateProductInput = z.infer<typeof createProductSchema>

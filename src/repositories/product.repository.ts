@@ -3,9 +3,9 @@ import type { Prisma } from '@prisma/client'
 import type { ProductFilters, PaginationParams, PaginationResult } from '@/types'
 
 export const productRepository = {
-  async findFeatured(limit = 8) {
+  async findFeatured(limit = 8, domain: string) {
     const products = await prisma.product.findMany({
-      where: { active: true, featured: true },
+      where: { active: true, featured: true, tenant: { subdomain: domain } },
       include: {
         category: { select: { id: true, name: true, slug: true } },
         images: { orderBy: { order: 'asc' }, take: 1, select: { url: true } },
@@ -20,12 +20,13 @@ export const productRepository = {
 
   async findWithFilters(
     filters: ProductFilters,
-    pagination: PaginationParams
+    pagination: PaginationParams,
+    domain: string
   ): Promise<{ products: ReturnType<typeof mapToPublicDTO>[]; pagination: PaginationResult }> {
-    const where: Prisma.ProductWhereInput = { active: true }
+    const where: Prisma.ProductWhereInput = { active: true, tenant: { subdomain: domain } }
 
     if (filters.categorySlug) {
-      where.category = { slug: filters.categorySlug }
+      where.category = { slug: filters.categorySlug, tenant: { subdomain: domain } }
     }
 
     if (filters.search) {
@@ -80,9 +81,9 @@ export const productRepository = {
     }
   },
 
-  async findBySlug(slug: string) {
-    const product = await prisma.product.findUnique({
-      where: { slug, active: true },
+  async findBySlug(slug: string, domain: string) {
+    const product = await prisma.product.findFirst({
+      where: { slug, active: true, tenant: { subdomain: domain } },
       include: {
         category: { select: { id: true, name: true, slug: true } },
         images: { orderBy: { order: 'asc' }, select: { id: true, url: true, order: true } },
@@ -107,9 +108,9 @@ export const productRepository = {
     }
   },
 
-  async findById(id: string) {
-    const product = await prisma.product.findUnique({
-      where: { id },
+  async findById(id: string, domain: string) {
+    const product = await prisma.product.findFirst({
+      where: { id, tenant: { subdomain: domain } },
       include: {
         category: { select: { id: true, name: true } },
         images: { orderBy: { order: 'asc' }, select: { id: true, url: true, order: true } },
@@ -136,10 +137,11 @@ export const productRepository = {
     }
   },
 
-  async findAdminList(pagination: PaginationParams) {
+  async findAdminList(pagination: PaginationParams, domain: string) {
     const [total, products] = await Promise.all([
-      prisma.product.count(),
+      prisma.product.count({ where: { tenant: { subdomain: domain } } }),
       prisma.product.findMany({
+        where: { tenant: { subdomain: domain } },
         include: {
           category: { select: { name: true } },
           images: { orderBy: { order: 'asc' }, take: 1, select: { url: true } },
@@ -172,22 +174,40 @@ export const productRepository = {
     }
   },
 
-  async create(data: Prisma.ProductCreateInput) {
-    const product = await prisma.product.create({ data })
-    return product
+  async create(data: Omit<Prisma.ProductUncheckedCreateInput, 'tenantId'>, domain: string) {
+    const tenant = await prisma.tenant.findUnique({ where: { subdomain: domain } })
+    if (!tenant) throw new Error('Tenant not found')
+    
+    const product = await prisma.product.create({ 
+      data: {
+        ...data,
+        tenantId: tenant.id
+      } 
+    })
+    return { ...product, price: Number(product.price) }
   },
 
-  async update(id: string, data: Prisma.ProductUpdateInput) {
+  async update(id: string, data: Prisma.ProductUncheckedUpdateInput, domain: string) {
+    // Verify product belongs to tenant
+    const existing = await this.findById(id, domain)
+    if (!existing) throw new Error('Product not found')
+
     const product = await prisma.product.update({ where: { id }, data })
-    return product
+    return { ...product, price: Number(product.price) }
   },
 
-  async delete(id: string): Promise<void> {
+  async delete(id: string, domain: string): Promise<void> {
+    const existing = await this.findById(id, domain)
+    if (!existing) throw new Error('Product not found')
+
     await prisma.product.delete({ where: { id } })
   },
 
-  async existsBySlug(slug: string, excludeId?: string): Promise<boolean> {
-    const where = excludeId ? { slug, NOT: { id: excludeId } } : { slug }
+  async existsBySlug(slug: string, domain: string, excludeId?: string): Promise<boolean> {
+    const where: any = { slug, tenant: { subdomain: domain } }
+    if (excludeId) {
+      where.NOT = { id: excludeId }
+    }
     const count = await prisma.product.count({ where })
     return count > 0
   },

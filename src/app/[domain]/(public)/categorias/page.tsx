@@ -11,8 +11,9 @@ export const metadata: Metadata = {
   description: 'Explora nuestras categorías de colchones, camas y muebles para el hogar.',
 }
 
-export default async function CategoriesPage() {
-  const categories = await getCachedPublicCategories()
+export default async function CategoriesPage({ params }: { params: Promise<{ domain: string }> }) {
+  const { domain } = await params
+  const categories = await getCachedPublicCategories(domain)
 
   return (
     <div className={styles.page}>

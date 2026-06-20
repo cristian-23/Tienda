@@ -79,3 +79,30 @@
   border-color: var(--color-accent);
   box-shadow: 0 0 0 3px rgba(196, 162, 101, 0.15);
 }
+
+@media (max-width: 768px) {
+  .filters {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-4);
+  }
+  .section {
+    flex: 1 1 200px;
+    gap: var(--space-2);
+  }
+  .list {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .link {
+    width: auto;
+    padding: var(--space-2) var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+}

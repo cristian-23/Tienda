@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Poppins } from 'next/font/google'
 import { settingsService } from '@/services/settings.service'
+import { getDomainFromHeaders } from '@/lib/server-utils'
 import '@/styles/globals.css'
 
 const poppins = Poppins({
@@ -11,7 +12,8 @@ const poppins = Poppins({
 })
 
 export async function generateMetadata(): Promise<Metadata> {
-  const settings = await settingsService.get()
+  const domain = await getDomainFromHeaders()
+  const settings = await settingsService.get(domain)
   return {
     title: {
       template: '%s | ' + (settings?.businessName || 'Colchones & Descanso'),

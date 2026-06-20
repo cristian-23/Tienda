@@ -11,4 +11,7 @@ export type StoreSettingsDTO = {
   instagramUrl: string | null
   logoUrl: string | null
   faviconUrl: string | null
+  heroTitle: string | null
+  heroSubtitle: string | null
+  aboutText: string | null
 }

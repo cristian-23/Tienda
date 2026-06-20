@@ -3,19 +3,19 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ProductGallery } from '@/components/public/ProductGallery/ProductGallery'
 import { WhatsAppButton } from '@/components/public/WhatsAppButton/WhatsAppButton'
-import { getCachedProductBySlug, getCachedSettings } from '@/lib/cached-queries'
+import { getCachedProductBySlug, getCachedStoreSettings } from '@/lib/cached-queries'
 import { formatPrice } from '@/lib/utils'
 import styles from './page.module.css'
 
 export const revalidate = 60
 
 type Props = {
-  params: Promise<{ slug: string }>
+  params: Promise<{ slug: string; domain: string }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params
-  const product = await getCachedProductBySlug(slug)
+  const { slug, domain } = await params
+  const product = await getCachedProductBySlug(slug, domain)
 
   if (!product) return { title: 'Producto no encontrado' }
 
@@ -31,10 +31,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ProductDetailPage({ params }: Props) {
-  const { slug } = await params
+  const { slug, domain } = await params
   const [product, settings] = await Promise.all([
-    getCachedProductBySlug(slug),
-    getCachedSettings(),
+    getCachedProductBySlug(slug, domain),
+    getCachedStoreSettings(domain),
   ])
 
   if (!product) notFound()

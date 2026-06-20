@@ -11,13 +11,13 @@ import styles from './page.module.css'
 export const revalidate = 60
 
 type Props = {
-  params: Promise<{ slug: string }>
+  params: Promise<{ slug: string; domain: string }>
   searchParams: Promise<{ page?: string }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params
-  const category = await categoryRepository.findBySlug(slug)
+  const { slug, domain } = await params
+  const category = await categoryRepository.findBySlug(slug, domain)
 
   if (!category) return { title: 'Categoría no encontrada' }
 
@@ -28,15 +28,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function CategoryPage({ params, searchParams }: Props) {
-  const { slug } = await params
+  const { slug, domain } = await params
   const { page: pageParam } = await searchParams
   const page = Math.max(1, Number(pageParam) || 1)
 
   const [category, result] = await Promise.all([
-    categoryRepository.findBySlug(slug),
+    categoryRepository.findBySlug(slug, domain),
     getCachedProductsWithFilters(
       { categorySlug: slug },
-      { page, pageSize: PAGINATION.DEFAULT_PAGE_SIZE }
+      { page, pageSize: PAGINATION.DEFAULT_PAGE_SIZE },
+      domain
     ),
   ])
 

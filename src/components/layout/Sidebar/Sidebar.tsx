@@ -13,7 +13,11 @@ const navItems = [
   { label: 'Configuración', icon: 'pi pi-cog', url: '/admin/configuracion' },
 ]
 
-export function Sidebar() {
+type SidebarProps = {
+  businessName: string
+}
+
+export function Sidebar({ businessName }: SidebarProps) {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
 
@@ -90,7 +94,7 @@ export function Sidebar() {
         </nav>
 
         <div className={styles.footer}>
-          <span className={styles.footerText}>Colchones & Descanso</span>
+          <span className={styles.footerText}>{businessName}</span>
           <span className={styles.footerSub}>v1.0.0</span>
         </div>
       </aside>

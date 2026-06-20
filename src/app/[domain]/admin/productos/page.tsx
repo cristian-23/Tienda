@@ -5,11 +5,12 @@ import { redirect } from 'next/navigation'
 import { productRepository } from '@/repositories/product.repository'
 import { ProductsTable } from './ProductsTable'
 
-export default async function AdminProductsPage() {
+export default async function AdminProductsPage({ params }: { params: Promise<{ domain: string }> }) {
   const session = await auth()
   if (!session?.user) redirect('/admin')
 
-  const { products } = await productRepository.findAdminList({ page: 1, pageSize: 100 })
+  const { domain } = await params
+  const { products } = await productRepository.findAdminList({ page: 1, pageSize: 100 }, domain)
 
   return <ProductsTable products={products} />
 }

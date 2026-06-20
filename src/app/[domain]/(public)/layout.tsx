@@ -1,17 +1,20 @@
 import { Header } from '@/components/layout/Header/Header'
 import { Footer } from '@/components/layout/Footer/Footer'
 import { WhatsAppFloat } from '@/components/layout/WhatsAppFloat/WhatsAppFloat'
-import { getCachedSettings } from '@/lib/cached-queries'
+import { getCachedStoreSettings } from '@/lib/cached-queries'
 import styles from './layout.module.css'
 
 export const revalidate = 300
 
 export default async function PublicLayout({
   children,
+  params,
 }: {
   children: React.ReactNode
+  params: Promise<{ domain: string }>
 }) {
-  const settings = await getCachedSettings()
+  const { domain } = await params
+  const settings = await getCachedStoreSettings(domain)
 
   const businessName = settings?.businessName ?? 'Colchones & Descanso'
   const whatsappNumber = settings?.whatsappNumber ?? ''

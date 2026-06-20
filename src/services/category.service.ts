@@ -4,11 +4,11 @@ import { NotFoundError, ConflictError } from '@/lib/errors'
 import type { CreateCategoryInput, UpdateCategoryInput } from '@/validations/category.schema'
 import type { CategoryAdminDTO, CategoryPublicDTO } from '@/types'
 
-async function generateUniqueSlug(name: string, excludeId?: string): Promise<string> {
+async function generateUniqueSlug(name: string, domain: string, excludeId?: string): Promise<string> {
   let slug = slugify(name)
   let counter = 1
 
-  while (await categoryRepository.existsBySlug(slug, excludeId)) {
+  while (await categoryRepository.existsBySlug(slug, domain, excludeId)) {
     slug = `${slugify(name)}-${counter}`
     counter++
   }
@@ -17,8 +17,8 @@ async function generateUniqueSlug(name: string, excludeId?: string): Promise<str
 }
 
 export const categoryService = {
-  async getPublicCategories(): Promise<CategoryPublicDTO[]> {
-    const categories = await categoryRepository.findAllWithProductCount(true)
+  async getPublicCategories(domain: string): Promise<CategoryPublicDTO[]> {
+    const categories = await categoryRepository.findAllWithProductCount(domain, true)
     return categories.map((c) => ({
       id: c.id,
       name: c.name,
@@ -28,8 +28,8 @@ export const categoryService = {
     }))
   },
 
-  async getAdminCategories(): Promise<CategoryAdminDTO[]> {
-    const categories = await categoryRepository.findAllWithProductCount(false)
+  async getAdminCategories(domain: string): Promise<CategoryAdminDTO[]> {
+    const categories = await categoryRepository.findAllWithProductCount(domain, false)
     return categories.map((c) => ({
       id: c.id,
       name: c.name,
@@ -42,11 +42,11 @@ export const categoryService = {
     }))
   },
 
-  async getById(id: string): Promise<CategoryAdminDTO> {
-    const category = await categoryRepository.findById(id)
+  async getById(id: string, domain: string): Promise<CategoryAdminDTO> {
+    const category = await categoryRepository.findById(id, domain)
     if (!category) throw new NotFoundError('Categoría')
 
-    const productCount = await categoryRepository.countProducts(id)
+    const productCount = await categoryRepository.countProducts(id, domain)
     return {
       id: category.id,
       name: category.name,
@@ -59,9 +59,9 @@ export const categoryService = {
     }
   },
 
-  async create(input: CreateCategoryInput) {
-    const slug = input.slug || (await generateUniqueSlug(input.name))
-    const exists = await categoryRepository.existsBySlug(slug)
+  async create(input: CreateCategoryInput, domain: string) {
+    const slug = input.slug || (await generateUniqueSlug(input.name, domain))
+    const exists = await categoryRepository.existsBySlug(slug, domain)
     if (exists) throw new ConflictError('El slug ya está en uso')
 
     return categoryRepository.create({
@@ -69,16 +69,16 @@ export const categoryService = {
       slug,
       description: input.description || undefined,
       active: input.active,
-    })
+    }, domain)
   },
 
-  async update(id: string, input: UpdateCategoryInput) {
-    const existing = await categoryRepository.findById(id)
+  async update(id: string, input: UpdateCategoryInput, domain: string) {
+    const existing = await categoryRepository.findById(id, domain)
     if (!existing) throw new NotFoundError('Categoría')
 
-    const slug = input.slug || (await generateUniqueSlug(input.name ?? existing.name, id))
+    const slug = input.slug || (await generateUniqueSlug(input.name ?? existing.name, domain, id))
     if (slug !== existing.slug) {
-      const exists = await categoryRepository.existsBySlug(slug, id)
+      const exists = await categoryRepository.existsBySlug(slug, domain, id)
       if (exists) throw new ConflictError('El slug ya está en uso')
     }
 
@@ -87,18 +87,18 @@ export const categoryService = {
       slug,
       ...(input.description !== undefined && { description: input.description }),
       ...(input.active !== undefined && { active: input.active }),
-    })
+    }, domain)
   },
 
-  async delete(id: string): Promise<void> {
-    const existing = await categoryRepository.findById(id)
+  async delete(id: string, domain: string): Promise<void> {
+    const existing = await categoryRepository.findById(id, domain)
     if (!existing) throw new NotFoundError('Categoría')
 
-    const productCount = await categoryRepository.countProducts(id)
+    const productCount = await categoryRepository.countProducts(id, domain)
     if (productCount > 0) {
       throw new ConflictError('No se puede eliminar una categoría con productos asociados')
     }
 
-    await categoryRepository.delete(id)
+    await categoryRepository.delete(id, domain)
   },
 }

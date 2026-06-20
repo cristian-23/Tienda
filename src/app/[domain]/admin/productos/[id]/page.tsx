@@ -7,17 +7,17 @@ import { productRepository } from '@/repositories/product.repository'
 import { categoryRepository } from '@/repositories/category.repository'
 import styles from './page.module.css'
 
-type Props = { params: Promise<{ id: string }> }
+type Props = { params: Promise<{ id: string; domain: string }> }
 
 export default async function EditProductPage({ params }: Props) {
   const session = await auth()
   if (!session?.user) redirect('/admin')
 
-  const { id } = await params
+  const { id, domain } = await params
 
   const [product, categories] = await Promise.all([
-    productRepository.findById(id),
-    categoryRepository.findAllActive(),
+    productRepository.findById(id, domain),
+    categoryRepository.findAllActive(domain),
   ])
 
   if (!product) notFound()

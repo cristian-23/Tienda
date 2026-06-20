@@ -35,6 +35,9 @@ export function StoreSettingsForm({ defaultValues, onSubmit }: StoreSettingsForm
       instagramUrl: defaultValues.instagramUrl ?? '',
       logoUrl: defaultValues.logoUrl ?? '',
       faviconUrl: defaultValues.faviconUrl ?? '',
+      heroTitle: defaultValues.heroTitle ?? '',
+      heroSubtitle: defaultValues.heroSubtitle ?? '',
+      aboutText: defaultValues.aboutText ?? '',
     } : {
       businessName: '',
       whatsappNumber: '',
@@ -43,6 +46,9 @@ export function StoreSettingsForm({ defaultValues, onSubmit }: StoreSettingsForm
       instagramUrl: '',
       logoUrl: '',
       faviconUrl: '',
+      heroTitle: '',
+      heroSubtitle: '',
+      aboutText: '',
     },
   })
 
@@ -102,6 +108,9 @@ export function StoreSettingsForm({ defaultValues, onSubmit }: StoreSettingsForm
       formData.set('instagramUrl', data.instagramUrl ?? '')
       formData.set('logoUrl', data.logoUrl ?? '')
       formData.set('faviconUrl', data.faviconUrl ?? '')
+      formData.set('heroTitle', data.heroTitle ?? '')
+      formData.set('heroSubtitle', data.heroSubtitle ?? '')
+      formData.set('aboutText', data.aboutText ?? '')
       const result = await onSubmit(null, formData)
       if (result.success) {
         showToast('success', 'Configuración guardada')
@@ -157,6 +166,16 @@ export function StoreSettingsForm({ defaultValues, onSubmit }: StoreSettingsForm
         <div className={styles.sectionHeader}>
           <span className={styles.sectionTitle}>Marca y Landing Page</span>
         </div>
+
+        <Controller name="heroTitle" control={control} render={({ field }) => (
+          <Input label="Título de Portada (Hero Title)" value={field.value} onChange={field.onChange} onBlur={field.onBlur} error={errors.heroTitle?.message} placeholder="Ej: Colchones & Descanso" />
+        )} />
+        <Controller name="heroSubtitle" control={control} render={({ field }) => (
+          <Textarea label="Subtítulo de Portada (Hero Subtitle)" value={field.value} onChange={field.onChange} onBlur={field.onBlur} error={errors.heroSubtitle?.message} placeholder="Ej: Los mejores productos para tu hogar." />
+        )} />
+        <Controller name="aboutText" control={control} render={({ field }) => (
+          <Textarea label="Texto 'Acerca de nosotros'" value={field.value} onChange={field.onChange} onBlur={field.onBlur} error={errors.aboutText?.message} placeholder="Ej: Somos una empresa dedicada a..." />
+        )} />
 
         <div className={styles.logoSection}>
           <span className={styles.logoLabel}>Favicon de la Landing Page</span>

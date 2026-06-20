@@ -10,6 +10,9 @@ function mapSettings(settings: {
   instagramUrl: string | null
   logoUrl: string | null
   faviconUrl: string | null
+  heroTitle: string | null
+  heroSubtitle: string | null
+  aboutText: string | null
 }): StoreSettingsDTO {
   const addresses = Array.isArray(settings.addresses)
     ? (settings.addresses as { label: string; address: string }[])
@@ -22,19 +25,31 @@ function mapSettings(settings: {
     instagramUrl: settings.instagramUrl,
     logoUrl: settings.logoUrl,
     faviconUrl: settings.faviconUrl,
+    heroTitle: settings.heroTitle,
+    heroSubtitle: settings.heroSubtitle,
+    aboutText: settings.aboutText,
   }
 }
 
 export const settingsRepository = {
-  async get(): Promise<StoreSettingsDTO | null> {
-    const settings = await prisma.storeSettings.findUnique({ where: { id: 'default' } })
+  async getByDomain(domain: string): Promise<StoreSettingsDTO | null> {
+    const settings = await prisma.storeSettings.findFirst({
+      where: {
+        tenant: {
+          subdomain: domain
+        }
+      }
+    })
     if (!settings) return null
     return mapSettings(settings)
   },
 
-  async upsert(data: UpdateSettingsInput): Promise<StoreSettingsDTO> {
+  async upsert(data: UpdateSettingsInput, domain: string): Promise<StoreSettingsDTO> {
+    const tenant = await prisma.tenant.findUnique({ where: { subdomain: domain } })
+    if (!tenant) throw new Error('Tenant not found')
+
     const settings = await prisma.storeSettings.upsert({
-      where: { id: 'default' },
+      where: { tenantId: tenant.id },
       update: {
         businessName: data.businessName,
         whatsappNumber: data.whatsappNumber,
@@ -43,9 +58,11 @@ export const settingsRepository = {
         instagramUrl: data.instagramUrl || null,
         logoUrl: data.logoUrl || null,
         faviconUrl: data.faviconUrl || null,
+        heroTitle: data.heroTitle || null,
+        heroSubtitle: data.heroSubtitle || null,
+        aboutText: data.aboutText || null,
       },
       create: {
-        id: 'default',
         businessName: data.businessName,
         whatsappNumber: data.whatsappNumber,
         addresses: data.addresses,
@@ -53,6 +70,10 @@ export const settingsRepository = {
         instagramUrl: data.instagramUrl || null,
         logoUrl: data.logoUrl || null,
         faviconUrl: data.faviconUrl || null,
+        heroTitle: data.heroTitle || null,
+        heroSubtitle: data.heroSubtitle || null,
+        aboutText: data.aboutText || null,
+        tenantId: tenant.id
       },
     })
     return mapSettings(settings)

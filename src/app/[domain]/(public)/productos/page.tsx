@@ -23,20 +23,27 @@ type SearchParams = Promise<{
   page?: string
 }>
 
-export default async function ProductsPage(props: { searchParams: SearchParams }) {
-  const searchParams = await props.searchParams
-  const page = Math.max(1, Number(searchParams.page) || 1)
+export default async function ProductsPage({
+  searchParams,
+  params,
+}: {
+  searchParams: SearchParams
+  params: Promise<{ domain: string }>
+}) {
+  const resolvedSearchParams = await searchParams
+  const { domain } = await params
+  const page = Math.max(1, Number(resolvedSearchParams.page) || 1)
 
   const filters = {
-    search: searchParams.search,
-    categorySlug: searchParams.category,
-    sortBy: searchParams.sortBy,
-    sortDirection: searchParams.sortDirection,
+    search: resolvedSearchParams.search,
+    categorySlug: resolvedSearchParams.category,
+    sortBy: resolvedSearchParams.sortBy,
+    sortDirection: resolvedSearchParams.sortDirection,
   }
 
   const [result, categories] = await Promise.all([
-    getCachedProductsWithFilters(filters, { page, pageSize: PAGINATION.DEFAULT_PAGE_SIZE }),
-    getCachedPublicCategories(),
+    getCachedProductsWithFilters(filters, { page, pageSize: PAGINATION.DEFAULT_PAGE_SIZE }, domain),
+    getCachedPublicCategories(domain),
   ])
 
   const filterCategories = categories.map((c) => ({
@@ -51,18 +58,18 @@ export default async function ProductsPage(props: { searchParams: SearchParams }
         <SectionHeader
           title="Catálogo de productos"
           subtitle={
-            searchParams.search
-              ? `Resultados para "${searchParams.search}"`
-              : 'Explora nuestra colección completa de colchones, camas y muebles.'
+            resolvedSearchParams.search
+              ? `Resultados para "${resolvedSearchParams.search}"`
+              : 'Explora nuestra colección completa.'
           }
         />
 
         <div className={styles.layout}>
           <ProductFilters
             categories={filterCategories}
-            selectedCategory={searchParams.category}
-            sortBy={searchParams.sortBy}
-            sortDirection={searchParams.sortDirection}
+            selectedCategory={resolvedSearchParams.category}
+            sortBy={resolvedSearchParams.sortBy}
+            sortDirection={resolvedSearchParams.sortDirection}
             baseUrl="/productos"
           />
 
@@ -76,10 +83,10 @@ export default async function ProductsPage(props: { searchParams: SearchParams }
               baseUrl="/productos"
               searchParams={
                 {
-                  ...(searchParams.search && { search: searchParams.search }),
-                  ...(searchParams.category && { category: searchParams.category }),
-                  ...(searchParams.sortBy && { sortBy: searchParams.sortBy }),
-                  ...(searchParams.sortDirection && { sortDirection: searchParams.sortDirection }),
+                  ...(resolvedSearchParams.search && { search: resolvedSearchParams.search }),
+                  ...(resolvedSearchParams.category && { category: resolvedSearchParams.category }),
+                  ...(resolvedSearchParams.sortBy && { sortBy: resolvedSearchParams.sortBy }),
+                  ...(resolvedSearchParams.sortDirection && { sortDirection: resolvedSearchParams.sortDirection }),
                 } as Record<string, string>
               }
             />

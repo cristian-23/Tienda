@@ -2,6 +2,7 @@ import NextAuth from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 import bcrypt from 'bcryptjs'
 import { prisma } from './prisma'
+import { getDomainFromHeaders } from './server-utils'
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -22,9 +23,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
           const user = await prisma.user.findUnique({
             where: { email },
+            include: { tenant: true }
           })
 
           if (!user) {
+            return null
+          }
+
+          const domain = await getDomainFromHeaders()
+          
+          // User must belong to the tenant domain they are trying to login
+          if (user.tenant.subdomain !== domain) {
             return null
           }
 
@@ -38,6 +47,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             id: user.id,
             email: user.email,
             name: user.name,
+            tenantId: user.tenantId
           }
         } catch {
           return null
@@ -55,12 +65,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id
+        token.tenantId = (user as any).tenantId
       }
       return token
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string
+        ;(session.user as any).tenantId = token.tenantId as string
       }
       return session
     },
