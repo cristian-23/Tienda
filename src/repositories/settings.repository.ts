@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import type { UpdateSettingsInput } from '@/validations/settings.schema'
 import type { StoreSettingsDTO } from '@/types'
+import { deleteImage } from '@/lib/cloudinary'
 
 function mapSettings(settings: {
   businessName: string
@@ -49,6 +50,23 @@ export const settingsRepository = {
   async upsert(data: UpdateSettingsInput, domain: string): Promise<StoreSettingsDTO> {
     const tenant = await prisma.tenant.findUnique({ where: { subdomain: domain } })
     if (!tenant) throw new Error('Tenant not found')
+
+    // Clean up replaced images from Cloudinary to avoid leaks
+    const oldSettings = await prisma.storeSettings.findUnique({
+      where: { tenantId: tenant.id },
+    })
+
+    if (oldSettings) {
+      if (oldSettings.logoUrl && oldSettings.logoUrl !== data.logoUrl) {
+        await deleteImage(oldSettings.logoUrl).catch(err => console.error('Error deleting old logo:', err))
+      }
+      if (oldSettings.faviconUrl && oldSettings.faviconUrl !== data.faviconUrl) {
+        await deleteImage(oldSettings.faviconUrl).catch(err => console.error('Error deleting old favicon:', err))
+      }
+      if (oldSettings.heroBgUrl && oldSettings.heroBgUrl !== data.heroBgUrl) {
+        await deleteImage(oldSettings.heroBgUrl).catch(err => console.error('Error deleting old hero background:', err))
+      }
+    }
 
     const settings = await prisma.storeSettings.upsert({
       where: { tenantId: tenant.id },

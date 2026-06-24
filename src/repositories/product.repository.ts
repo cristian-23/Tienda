@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
-import type { Prisma } from '@prisma/client'
+import { Prisma } from '@prisma/client'
+import { deleteImage } from '@/lib/cloudinary'
 import type { ProductFilters, PaginationParams, PaginationResult } from '@/types'
 
 export const productRepository = {
@@ -199,6 +200,12 @@ export const productRepository = {
   async delete(id: string, domain: string): Promise<void> {
     const existing = await this.findById(id, domain)
     if (!existing) throw new Error('Product not found')
+
+    if (existing.images && existing.images.length > 0) {
+      for (const img of existing.images) {
+        await deleteImage(img.url).catch(err => console.error('Error deleting product image from Cloudinary:', err))
+      }
+    }
 
     await prisma.product.delete({ where: { id } })
   },

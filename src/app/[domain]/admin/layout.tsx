@@ -4,6 +4,7 @@ import 'primeicons/primeicons.css'
 import '@/styles/prime-overrides.css'
 import { settingsService } from '@/services/settings.service'
 import { AdminLayoutShell } from './AdminLayoutShell'
+import { PWAInstallPrompt } from '@/components/admin/PWAInstallPrompt/PWAInstallPrompt'
 
 type Props = {
   children: React.ReactNode
@@ -18,5 +19,10 @@ export default async function AdminLayout({
   const settings = await settingsService.get(domain)
   const businessName = settings?.businessName ?? 'Admin Panel'
 
-  return <AdminLayoutShell businessName={businessName}>{children}</AdminLayoutShell>
+  return (
+    <>
+      <AdminLayoutShell businessName={businessName}>{children}</AdminLayoutShell>
+      <PWAInstallPrompt />
+    </>
+  )
 }
